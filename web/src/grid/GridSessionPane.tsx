@@ -111,7 +111,6 @@ export function GridSessionPane({
   const serverInfo = useServerInfo();
   const permissionLevel = session?.permissionLevel ?? (canEdit ? null : 1);
   const grids = useGridSessions()!;
-  // The cell's composer and the full-screen composer share this session's draft.
   useSharedSessionDraft(sessionId);
   const title = session?.title || "Session";
   const {

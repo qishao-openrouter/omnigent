@@ -285,7 +285,8 @@ import { extensionPathParts, resolveExtensionPageFromPath } from "@/extensions/c
 import { NewProjectButton } from "./NewProjectButton";
 import { SessionImportStatus } from "./SessionImportStatus";
 import { useSessionImportStore } from "@/store/sessionImport";
-import { SettingsSidebarBody, useSettingsRoute, useTrackSettingsReturn } from "./settingsNav";
+import { useSettingsRoute, useTrackSettingsReturn } from "./settingsNav";
+import { SettingsSidebar } from "./settingsSearch/SettingsSidebar";
 import {
   type ActiveChatOverride,
   clearLegacyPinnedConversationIds,
@@ -945,6 +946,10 @@ function SidebarImpl({
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (isMobileViewport() && !isSideBySideSidebarViewport()) onClose();
   });
+  // A search result that opens its row closes the phone's menu, as a section link does.
+  const onSearchNavigate = useStableCallback(() => {
+    if (isMobileViewport() && !isSideBySideSidebarViewport()) onClose();
+  });
 
   // Which top-level nav button to highlight for the current route.
   const {
@@ -1343,9 +1348,10 @@ function SidebarImpl({
           />
         )}
         {inSettings ? (
-          <SettingsSidebarBody
+          <SettingsSidebar
             onNavClick={onNavClick}
             harnessesOffered={curatedOutHarnesses.size < NATIVE_CODING_AGENTS.length}
+            onNavigate={onSearchNavigate}
           />
         ) : (
           <>

@@ -78,7 +78,7 @@ export function settingsSectionPath(id: SettingsSectionId): string {
   return `/settings/${id}`;
 }
 
-interface SettingsNavItem {
+export interface SettingsNavItem {
   id: SettingsSectionId;
   label: string;
   icon: typeof PaletteIcon;
@@ -253,14 +253,8 @@ export function useTrackSettingsReturn(): void {
  * Settings nav rendered inside the sidebar card, replacing the conversation
  * list on /settings. Its Back row matches the navigation rows below it.
  */
-export function SettingsSidebarBody({
-  onNavClick,
-  harnessesOffered = true,
-}: {
-  onNavClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-  /** False when the deployment curated out every harness, which drops Harnesses. */
-  harnessesOffered?: boolean;
-}) {
+/** The sections Settings shows here: this viewer's, this deploy's and this build's. */
+export function useSettingsNavGroups(harnessesOffered = true): SettingsNavGroup[] {
   const info = useServerInfo();
   // Account section shows whenever there's a login session (accounts OR OIDC).
   const hasAuthSession = info !== "loading" && info.login_url !== null;
@@ -271,8 +265,7 @@ export function SettingsSidebarBody({
   const integrationsEnabled =
     info !== "loading" && (info.enabled_connections ?? []).some((provider) => provider !== "mcp");
   const mcpEnabled = info !== "loading" && (info.enabled_connections ?? []).includes("mcp");
-  const { section } = useSettingsRoute();
-  const groups = settingsNavGroups(
+  return settingsNavGroups(
     hasAuthSession,
     isElectronShell(),
     isAdmin,
@@ -283,6 +276,18 @@ export function SettingsSidebarBody({
     info !== "loading" && info.sibling_sessions === true,
     harnessesOffered,
   );
+}
+
+export function SettingsSidebarBody({
+  onNavClick,
+  harnessesOffered = true,
+}: {
+  onNavClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  /** False when the deployment curated out every harness, which drops Harnesses. */
+  harnessesOffered?: boolean;
+}) {
+  const { section } = useSettingsRoute();
+  const groups = useSettingsNavGroups(harnessesOffered);
 
   return (
     <>
